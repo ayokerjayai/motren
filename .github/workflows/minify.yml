@@ -1,0 +1,42 @@
+name: Minify Website Files
+
+on:
+  push:
+    branches:
+      - main  # Jalankan ini setiap kali ada push ke branch 'main'
+
+jobs:
+  minify:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14'
+
+    - name: Install dependencies
+      run: |
+        npm install html-minifier terser cssnano-cli
+
+    - name: Minify HTML, CSS, and JS
+      run: |
+        # Minify HTML
+        find ./src -name "*.html" -exec html-minifier --collapse-whitespace --remove-comments --minify-js true --minify-css true -o {} {} \;
+
+        # Minify CSS
+        find ./src -name "*.css" -exec cssnano {} {}.min.css \;
+
+        # Minify JavaScript
+        find ./src -name "*.js" -exec terser {} -o {}.min.js \;
+
+    - name: Commit and Push Changes
+      run: |
+        git config --global user.email "youremail@example.com"
+        git config --global user.name "Your Name"
+        git add .
+        git commit -m "Minified HTML, CSS, and JS"
+        git push

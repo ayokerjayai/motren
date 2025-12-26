@@ -1,17 +1,17 @@
 export default {
   async fetch(request, env, ctx) {
-    // Ganti dengan URL Blogger kamu
     const bloggerURL = "https://www.motren.id" + new URL(request.url).pathname;
 
-    // Ambil konten dari Blogger
-    let response = await fetch(bloggerURL);
-    let html = await response.text();
+    // fetch dengan Host header override
+    let response = await fetch(bloggerURL, {
+      headers: {
+        "Host": "ghs.google.com"  // pastikan Blogger mengenali request
+      }
+    });
 
-    // Hapus semua komentar HTML
+    let html = await response.text();
     html = html.replace(/<!--[\s\S]*?-->/g, "");
 
-    return new Response(html, {
-      headers: { "Content-Type": "text/html" }
-    });
+    return new Response(html, { headers: { "Content-Type": "text/html" } });
   }
 };
